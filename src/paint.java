@@ -90,7 +90,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         offg.drawLine(15, 120, 55, 90);
         //rectangle
         if(square) {
-            offg.drawRect(15, 158, 40, 40);
+            offg.drawRect(15, 155, 40, 40);
         }
         else {
             offg.drawRect(15, 165, 40, 20);
@@ -104,7 +104,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawRect(85, 165, 40, 20);
             }
             else {
-                offg.drawRect(85, 158, 40, 40);
+                offg.drawRect(85, 155, 40, 40);
             }
         }
         //circle
@@ -266,7 +266,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         for(int i = 0; i < 7; i++) {
             if(p.y <= 70 + (i * 70)) {
                 if(selection == 2 && i == 2) {
-                    System.out.println("test");
                     if(square) square = false;
                     else square = true;
                 }
