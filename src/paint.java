@@ -12,14 +12,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     Image offscreen;
     Graphics offg;
     Timer timer;
-    int selection = 0;
+    int selection;
     Point lastFree;
-    //ArrayList<Rectangle> rectList;
-    //ArrayList<Line> lineList;
-    //ArrayList<Line> freeList;
-    //ArrayList<Circle> circleList;
     ArrayList<drawnObject> objectList;
-    boolean dragging, paintMenu, square, circle, hoverCircle, hoverSquare;
+    ArrayList<drawnObject> deletedObjects;
+    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare;
     Color color;
     
     @Override
@@ -31,16 +28,14 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         timer = new Timer(10, this);
         offscreen = createImage(this.getWidth(), this.getHeight());
         offg = offscreen.getGraphics();
-        //rectList = new ArrayList();
-        //lineList = new ArrayList();
-        //freeList = new ArrayList();
-        //circleList = new ArrayList();
         objectList = new ArrayList();
+        deletedObjects = new ArrayList();
         color = Color.BLACK;
         dragging = false;
         paintMenu = false;
         square = true;
         circle = true;
+        selection = 0;
     }
     
     @Override
@@ -50,22 +45,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         
         offg.setColor(Color.BLACK);
         
-        
-        
-        /*
-        for(int i = 0; i < lineList.size(); i++) {
-            lineList.get(i).paint(offg);
-        }
-        for(int i = 0; i < rectList.size(); i++) {
-            rectList.get(i).paint(offg);
-        }
-        for(int i = 0; i < freeList.size(); i++) {
-            freeList.get(i).paint(offg);
-        }
-        for(int i = 0; i < circleList.size(); i++) {
-            circleList.get(i).paint(offg);
-        }
-        */
         for(int i = 0; i < objectList.size(); i++) {
             objectList.get(i).paint(offg);
         }
@@ -84,9 +63,8 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawRect(0, (0 + (70 * i)), 70, 70);
             }
         }
-        
-        
-        //free hand
+
+        //freehand
         offg.drawLine(20, 55, 22, 48);
         offg.drawLine(20, 55, 25, 50);
         offg.drawLine(22, 48, 45, 20);
@@ -132,7 +110,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawOval(83, 222, 45, 45);
             }
         }
-        //elipse (?)
         
         //colors
         if(paintMenu) {
@@ -152,6 +129,32 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawRect((70 * i), 420, 70, 69);
             }
         }
+        if(editMenu) {
+            for(int i = 0; i < 6; i++) {
+                offg.setColor(Color.WHITE);
+                offg.fillRect((70 * i), 350, 70, 70);
+                offg.setColor(Color.BLACK);
+                offg.drawRect((70 * i), 350, 70, 70);
+            }
+            //undo
+            if(objectList.isEmpty()) offg.setColor(Color.LIGHT_GRAY);
+            offg.drawLine(85, 385, 125, 385);
+            offg.drawLine(85, 385, 95, 380);
+            offg.drawLine(85, 385, 95, 390);
+            offg.setColor(Color.BLACK);
+            
+            //redo
+            if(deletedObjects.isEmpty()) offg.setColor(Color.LIGHT_GRAY);
+            offg.drawLine(155, 385, 195, 385);
+            offg.drawLine(195, 385, 185, 380);
+            offg.drawLine(195, 385, 185, 390);
+            offg.setColor(Color.BLACK);
+            //select
+            
+            //save
+            
+            //load
+        }
         offg.setColor(color);
         offg.fillRect(0, 420, 70, 70);
         offg.setColor(Color.BLACK);
@@ -163,19 +166,15 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     public void drawShape(Point p) {
         if(selection == 0) {
-            //freeList.add(new Line(p.x, p.y, color));
             objectList.add(new drawnObject(p, color, false, 1));
         }
         if(selection == 1) {
-            //lineList.add(new Line(p.x, p.y, color));
             objectList.add(new drawnObject(p, color, false, 1));
         }
         if(selection == 2) {
-            //rectList.add(new Rectangle(p.x, p.y, color, square));
             objectList.add(new drawnObject(p, color, square, 2));
         }
         if(selection == 3) {
-            //circleList.add(new Circle(p.x, p.y, color, circle));
             objectList.add(new drawnObject(p, color, circle, 3));
         }
         if(selection == 4) {
@@ -236,7 +235,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getX() > 70) {
+        if(e.getX() > 70 && !editMenu) {
             drawShape(e.getPoint());
         }
     }
@@ -249,6 +248,26 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         }
         else if(me.getX() > 70) {
             dragging = false;
+        }
+        if(editMenu) {
+            if(me.getY() >= 350 && me.getY() <= 420) {
+                for(int i = 1; i < 6; i++) {
+                    if(me.getX() >= 70 && me.getX() <= (70 + (70 * i))) {
+                        if(i == 1) {
+                            if(!objectList.isEmpty()) {
+                                deletedObjects.add(objectList.remove(objectList.size() - 1));
+                                return;
+                            }
+                        }
+                        else if(i == 2) {
+                            if(!deletedObjects.isEmpty()) {
+                                objectList.add(deletedObjects.remove(deletedObjects.size() - 1));
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         }
         if(paintMenu) {
             if(me.getY() >= 420) {
@@ -283,6 +302,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                     if(circle) circle = false;
                     else circle = true;
                 }
+                if(i == 5) {
+                    if(editMenu) editMenu = false;
+                    else editMenu = true;
+                    return selection;
+                }
                 if(i == 6) {
                     if(paintMenu) paintMenu = false;
                     else paintMenu = true;
@@ -305,23 +329,18 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     @Override
     public void mouseDragged(MouseEvent e) {
         if(dragging && selection == 2) {
-            //rectList.get(rectList.size() - 1).updatePosition(e.getPoint());
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             return;
         }
         if(dragging && selection == 1) {
-            //lineList.get(lineList.size() - 1).updatePosition(e.getPoint());
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             return;
         }
         if(dragging && selection == 0) {
-            //freeList.get(freeList.size() - 1).updatePosition(e.getPoint());
-            //freeList.add(new Line(e.getX(), e.getY(), color));
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             objectList.add(new drawnObject(e.getPoint(), color, false, 1));
         }
         if(dragging && selection == 3) {
-            //circleList.get(circleList.size() -1).updatePosition(e.getPoint());
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
         }
     }
