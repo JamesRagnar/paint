@@ -52,6 +52,14 @@ public class Circle {
             xLength = x0 - p.x;
             yLength = y0 - p.y;
         }
+        if(circle) {
+            if(xLength > yLength) {
+                yLength = xLength;
+            }
+            else {
+                xLength = yLength;
+            }
+        }
     }
     
     

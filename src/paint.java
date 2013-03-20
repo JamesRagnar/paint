@@ -18,7 +18,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     ArrayList<Line> lineList;
     ArrayList<Line> freeList;
     ArrayList<Circle> circleList;
-    boolean dragging, paintMenu, square, circle;
+    boolean dragging, paintMenu, square, circle, hoverCircle, hoverSquare;
     Color color;
     
     @Override
@@ -95,12 +95,36 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         else {
             offg.drawRect(15, 165, 40, 20);
         }
+        if(hoverSquare) {
+            offg.setColor(Color.WHITE);
+            offg.fillRect(70, 140, 70, 70);
+            offg.setColor(Color.BLACK);
+            offg.drawRect(70, 140, 70, 70);
+            if(square) {
+                offg.drawRect(85, 165, 40, 20);
+            }
+            else {
+                offg.drawRect(85, 158, 40, 40);
+            }
+        }
         //circle
         if(circle) {
             offg.drawOval(13, 222, 45, 45);
         }
         else {
             offg.drawOval(13, 230, 45, 28);
+        }
+        if(hoverCircle) {
+            offg.setColor(Color.WHITE);
+            offg.fillRect(70, 210, 70, 70);
+            offg.setColor(Color.BLACK);
+            offg.drawRect(70, 210, 70, 70);
+            if(circle) {
+                offg.drawOval(83, 230, 45, 28);
+            }
+            else {
+                offg.drawOval(83, 222, 45, 45);
+            }
         }
         //elipse (?)
         
@@ -290,7 +314,20 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        
+        if(e.getX() <= 70 ) {
+            if(e.getY() > 140 && e.getY() < 210) {
+                hoverSquare = true;
+            }
+            else hoverSquare = false;
+            if(e.getY() > 210 && e.getY() < 280) {
+                hoverCircle = true;
+            }
+            else hoverCircle = false;
+        }
+        else {
+            hoverSquare = false;
+            hoverCircle = false;
+        }
     }
 
     
