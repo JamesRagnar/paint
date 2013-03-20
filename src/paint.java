@@ -14,10 +14,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     Timer timer;
     int selection = 0;
     Point lastFree;
-    ArrayList<Rectangle> rectList;
-    ArrayList<Line> lineList;
-    ArrayList<Line> freeList;
-    ArrayList<Circle> circleList;
+    //ArrayList<Rectangle> rectList;
+    //ArrayList<Line> lineList;
+    //ArrayList<Line> freeList;
+    //ArrayList<Circle> circleList;
+    ArrayList<drawnObject> objectList;
     boolean dragging, paintMenu, square, circle, hoverCircle, hoverSquare;
     Color color;
     
@@ -30,10 +31,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         timer = new Timer(10, this);
         offscreen = createImage(this.getWidth(), this.getHeight());
         offg = offscreen.getGraphics();
-        rectList = new ArrayList();
-        lineList = new ArrayList();
-        freeList = new ArrayList();
-        circleList = new ArrayList();
+        //rectList = new ArrayList();
+        //lineList = new ArrayList();
+        //freeList = new ArrayList();
+        //circleList = new ArrayList();
+        objectList = new ArrayList();
         color = Color.BLACK;
         dragging = false;
         paintMenu = false;
@@ -50,7 +52,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         
         
         
-        
+        /*
         for(int i = 0; i < lineList.size(); i++) {
             lineList.get(i).paint(offg);
         }
@@ -62,6 +64,10 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         }
         for(int i = 0; i < circleList.size(); i++) {
             circleList.get(i).paint(offg);
+        }
+        */
+        for(int i = 0; i < objectList.size(); i++) {
+            objectList.get(i).paint(offg);
         }
         
         offg.setColor(Color.WHITE);
@@ -157,16 +163,20 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     public void drawShape(Point p) {
         if(selection == 0) {
-            freeList.add(new Line(p.x, p.y, color));
+            //freeList.add(new Line(p.x, p.y, color));
+            objectList.add(new drawnObject(p, color, false, 1));
         }
         if(selection == 1) {
-            lineList.add(new Line(p.x, p.y, color));
+            //lineList.add(new Line(p.x, p.y, color));
+            objectList.add(new drawnObject(p, color, false, 1));
         }
         if(selection == 2) {
-            rectList.add(new Rectangle(p.x, p.y, color, square));
+            //rectList.add(new Rectangle(p.x, p.y, color, square));
+            objectList.add(new drawnObject(p, color, square, 2));
         }
         if(selection == 3) {
-            circleList.add(new Circle(p.x, p.y, color, circle));
+            //circleList.add(new Circle(p.x, p.y, color, circle));
+            objectList.add(new drawnObject(p, color, circle, 3));
         }
         if(selection == 4) {
             
@@ -295,19 +305,24 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     @Override
     public void mouseDragged(MouseEvent e) {
         if(dragging && selection == 2) {
-            rectList.get(rectList.size() - 1).updatePosition(e.getPoint());
+            //rectList.get(rectList.size() - 1).updatePosition(e.getPoint());
+            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             return;
         }
         if(dragging && selection == 1) {
-            lineList.get(lineList.size() - 1).updatePosition(e.getPoint());
+            //lineList.get(lineList.size() - 1).updatePosition(e.getPoint());
+            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             return;
         }
         if(dragging && selection == 0) {
-            freeList.get(freeList.size() - 1).updatePosition(e.getPoint());
-            freeList.add(new Line(e.getX(), e.getY(), color));
+            //freeList.get(freeList.size() - 1).updatePosition(e.getPoint());
+            //freeList.add(new Line(e.getX(), e.getY(), color));
+            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
+            objectList.add(new drawnObject(e.getPoint(), color, false, 1));
         }
         if(dragging && selection == 3) {
-            circleList.get(circleList.size() -1).updatePosition(e.getPoint());
+            //circleList.get(circleList.size() -1).updatePosition(e.getPoint());
+            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
         }
     }
 
