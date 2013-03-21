@@ -16,6 +16,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     Point lastFree;
     ArrayList<drawnObject> objectList;
     ArrayList<drawnObject> deletedObjects;
+    ArrayList<Integer> lineList;
     boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare;
     Color color;
     
@@ -30,6 +31,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         offg = offscreen.getGraphics();
         objectList = new ArrayList();
         deletedObjects = new ArrayList();
+        lineList = new ArrayList();
         color = Color.BLACK;
         dragging = false;
         paintMenu = false;
@@ -170,7 +172,9 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     public void drawShape(Point p) {
         if(selection == 0) {
-            objectList.add(new drawnObject(p, color, false, 1));
+            lineList.add(objectList.size()); //starting point
+            lineList.add(objectList.size()); //filler ending point
+            objectList.add(new drawnObject(p, color, false, 0));
         }
         if(selection == 1) {
             objectList.add(new drawnObject(p, color, false, 1));
@@ -258,6 +262,14 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                     if(me.getX() >= (70 * i) && me.getX() <= (70 + (70 * i))) {
                         if(i == 1) {
                             if(!objectList.isEmpty()) {
+                                if(objectList.get(objectList.size() - 1).type == 0 && !lineList.isEmpty()) {
+                                    for(int j = lineList.get(lineList.size() - 1) - 1; j > lineList.get(lineList.size() - 2) - 1; j--) {
+                                        deletedObjects.add(objectList.remove(j));
+                                    }
+                                    lineList.remove(lineList.size() - 1);
+                                    lineList.remove(lineList.size() - 1);
+                                    return;
+                                }
                                 deletedObjects.add(objectList.remove(objectList.size() - 1));
                                 return;
                             }
@@ -344,7 +356,8 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         }
         if(dragging && selection == 0) {
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
-            objectList.add(new drawnObject(e.getPoint(), color, false, 1));
+            objectList.add(new drawnObject(e.getPoint(), color, false, 0));
+            lineList.set(lineList.size() - 1, objectList.size());
         }
         if(dragging && selection == 3) {
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());

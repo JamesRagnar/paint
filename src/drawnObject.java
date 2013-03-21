@@ -9,13 +9,13 @@ public class drawnObject {
     Color color;
     Boolean lock;
     int type;
-    //1 = line, 2 = square, 3 = circle
+    //0 = freehand, 1 = line, 2 = square, 3 = circle
     
     public drawnObject(Point p, Color c, Boolean b, int t) {
         type = t;
         xPosition = p.x;
         yPosition = p.y;
-        if(type == 1) {
+        if(type == 1 || type == 0) {
             xLength = p.x;
             yLength = p.y;
         }
@@ -32,14 +32,14 @@ public class drawnObject {
         else if(type == 3) {
             g.drawOval(xPosition, yPosition, xLength, yLength);
         }
-        else if(type == 1) {
+        else if(type == 1 || type == 0) {
             g.drawLine(xPosition, yPosition, xLength, yLength);
         }
         g.setColor(Color.BLACK);
     }
     
     public void updatePosition(Point p) {
-        if(type == 1) {
+        if(type == 1 || type == 0) {
             xLength = p.x;
             yLength = p.y;
         }
