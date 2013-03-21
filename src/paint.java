@@ -12,12 +12,13 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     Image offscreen;
     Graphics offg;
     Timer timer;
-    int selection;
+    int selection, layer;
     Point lastFree;
     ArrayList<drawnObject> objectList;
     ArrayList<drawnObject> deletedObjects;
     ArrayList<Integer> lineList;
-    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare;
+    ArrayList<ArrayList<drawnObject>> layerList;
+    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare, layerMenu;
     Color color;
     
     @Override
@@ -38,6 +39,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         paintMenu = false;
         square = false;
         circle = false;
+        layerMenu = false;
         selection = 0;
     }
     
@@ -114,7 +116,19 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawOval(83, 222, 45, 45);
             }
         }
-        
+        //layers
+        offg.drawLine(15, 330, 45, 330);
+        offg.drawLine(15, 322, 45, 322);
+        offg.drawLine(15, 314, 45, 314);
+        offg.drawLine(30, 300, 60, 300);
+        offg.drawLine(15, 314, 30, 300);
+        offg.drawLine(45, 314, 60, 300);
+        offg.drawLine(15, 322, 24, 314);
+        offg.drawLine(15, 330, 24, 322);
+        offg.drawLine(45, 322, 60, 308);
+        offg.drawLine(52, 308, 60, 308);
+        offg.drawLine(45, 330, 60, 315);
+        offg.drawLine(52, 315, 60, 315);
         //colors
         if(paintMenu) {
             for(int i = 1; i < 11; i++) {
@@ -166,6 +180,33 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             //exit?
             offg.drawLine(430, 360, 480, 410);
             offg.drawLine(430, 410, 480, 360);
+        }
+        
+        //layer menu
+        if(layerMenu) {
+            for(int i = 1; i < 7; i++) {
+                offg.setColor(Color.WHITE);
+                offg.fillRect((70 * i), 280, 70, 70);
+                offg.setColor(Color.BLACK);
+                offg.drawRect((70 * i), 280, 70, 70);
+            }
+            offg.drawString("" + layer, 103, 320);
+            offg.drawLine(175, 295, 175, 335);
+            offg.drawLine(175, 295, 170, 305);
+            offg.drawLine(175, 295, 180, 305);
+            
+            offg.drawLine(245, 295, 245, 335);
+            offg.drawLine(245, 335, 240, 325);
+            offg.drawLine(245, 335, 250, 325);
+            
+            offg.drawLine(300, 335, 315, 295);
+            offg.drawLine(315, 295, 330, 335);
+            offg.drawLine(305, 322, 325, 322);
+            
+            offg.drawLine(385, 295, 385, 335);
+            offg.drawLine(365, 315, 405, 315);
+            
+            offg.drawLine(435, 315, 475, 315);
         }
         offg.setColor(color);
         offg.fillRect(0, 420, 70, 70);
@@ -265,6 +306,37 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             //ending an object
             dragging = false;
         }
+        if(layerMenu) {
+            if(me.getY() >= 280 && me.getY() <= 350 && me.getX() <= 490) {
+                for(int i = 1; i < 7; i++) {
+                    if(me.getX() >= (70 * i) && me.getX() <= (70 + (70 * i))) {
+                        if(i == 1) {
+                            //layer number, no action
+                        }
+                        else if(i == 2) {
+                            //up layer
+                            layer++;
+                        }
+                        else if(i == 3) {
+                            //down layer
+                            layer--;
+                        }
+                        else if(i == 4) {
+                            //view all layers
+                        }
+                        else if(i == 5) {
+                            //add layer
+                        }
+                        else if(i == 6) {
+                            //remove layer
+                        }
+                    }
+                }
+            }
+            else {
+                layerMenu = false;
+            }
+        }
         if(editMenu) {
             //selecting an edit tool
             if(me.getY() >= 350 && me.getY() <= 420 && me.getX() <= 490) {
@@ -361,6 +433,10 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                     if(paintMenu) paintMenu = false;
                     else paintMenu = true;
                     return selection;
+                }
+                if(i == 4) {
+                    if(layerMenu) layerMenu = false;
+                    else layerMenu = true;
                 }
                 //returns square number with cursor hit
                 return i;
