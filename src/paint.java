@@ -22,6 +22,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     @Override
     public void init() {
+        //Initial setup
         this.setSize(1000, 490);
         this.addKeyListener(this);
         this.addMouseListener(this);
@@ -35,22 +36,23 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         color = Color.BLACK;
         dragging = false;
         paintMenu = false;
-        square = true;
-        circle = true;
+        square = false;
+        circle = false;
         selection = 0;
     }
     
     @Override
     public void paint(Graphics g) {
+        //Governs what will be drawn on the screen every refresh
         offg.setColor(Color.WHITE);
         offg.fillRect(0, 0, 1000, 490);
         
         offg.setColor(Color.BLACK);
-        
+        //All drawn objects
         for(int i = 0; i < objectList.size(); i++) {
             objectList.get(i).paint(offg);
         }
-        
+        //Tool menu
         offg.setColor(Color.WHITE);
         offg.fillRect(0, 0, 70, 490);
         offg.setColor(Color.BLACK);
@@ -131,12 +133,12 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawRect((70 * i), 420, 70, 69);
             }
         }
-        
+        //Settings menu
         offg.drawOval(13, 380, 7, 7);
         offg.drawOval(32, 380, 7, 7);
         offg.drawOval(50, 380, 7, 7);
         if(editMenu) {
-            for(int i = 1; i < 6; i++) {
+            for(int i = 1; i < 7; i++) {
                 offg.setColor(Color.WHITE);
                 offg.fillRect((70 * i), 350, 70, 70);
                 offg.setColor(Color.BLACK);
@@ -160,6 +162,10 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             //save
             
             //load
+            
+            //exit?
+            offg.drawLine(430, 360, 480, 410);
+            offg.drawLine(430, 410, 480, 360);
         }
         offg.setColor(color);
         offg.fillRect(0, 420, 70, 70);
@@ -244,6 +250,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     @Override
     public void mousePressed(MouseEvent e) {
         if(e.getX() > 70 && !editMenu) {
+            //starting an object
             drawShape(e.getPoint());
         }
     }
@@ -251,20 +258,26 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     @Override
     public void mouseReleased(MouseEvent me) {
         if(me.getX() <= 70 && !dragging) {
+            //selecting a tool
             selection = getSelection(me.getPoint());
         }
         else if(me.getX() > 70) {
+            //ending an object
             dragging = false;
         }
         if(editMenu) {
-            if(me.getY() >= 350 && me.getY() <= 420 && me.getX() <= 420) {
-                for(int i = 1; i < 6; i++) {
+            //selecting an edit tool
+            if(me.getY() >= 350 && me.getY() <= 420 && me.getX() <= 490) {
+                for(int i = 1; i < 7; i++) {
                     if(me.getX() >= (70 * i) && me.getX() <= (70 + (70 * i))) {
                         if(i == 1) {
+                            //undo
                             if(!objectList.isEmpty()) {
                                 if(objectList.get(objectList.size() - 1).type == 0 && !lineList.isEmpty()) {
                                     for(int j = lineList.get(lineList.size() - 1) - 1; j > lineList.get(lineList.size() - 2) - 1; j--) {
-                                        deletedObjects.add(objectList.remove(j));
+                                        //undoes a object and adds it to the redo list
+                                        //deletedObjects.add(objectList.remove(j));
+                                        objectList.remove(j); //only deletes the object, temporary fix for freehand undo issue
                                     }
                                     lineList.remove(lineList.size() - 1);
                                     lineList.remove(lineList.size() - 1);
@@ -275,10 +288,24 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                             }
                         }
                         else if(i == 2) {
+                            //redo
                             if(!deletedObjects.isEmpty()) {
                                 objectList.add(deletedObjects.remove(deletedObjects.size() - 1));
                                 return;
                             }
+                        }
+                        else if(i == 3) {
+                            //select
+                        }
+                        else if(i ==4) {
+                            //save
+                        }
+                        else if(i == 5) {
+                            //load
+                        }
+                        else if(i == 6) {
+                            //quit
+                            System.exit(0);
                         }
                     }
                 }
@@ -288,6 +315,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             }
         }
         if(paintMenu) {
+            //selecting a color
             if(me.getY() >= 420) {
                 for(int i = 1; i < 11; i++) {
                     if(me.getX() >= 70 && me.getX() <= (70 + (70 * i))) {
@@ -313,26 +341,32 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         for(int i = 0; i < 7; i++) {
             if(p.y <= 70 + (i * 70)) {
                 if(selection == 2 && i == 2) {
+                    //toggle between rectangle and square
                     if(square) square = false;
                     else square = true;
                 }
                 if(selection == 3 && i == 3) {
+                    //toggle between ellipse and circle
                     if(circle) circle = false;
                     else circle = true;
                 }
                 if(i == 5) {
+                    //toggle edit menu
                     if(editMenu) editMenu = false;
                     else editMenu = true;
                     return selection;
                 }
                 if(i == 6) {
+                    //toggle paint menu
                     if(paintMenu) paintMenu = false;
                     else paintMenu = true;
                     return selection;
                 }
+                //returns square number with cursor hit
                 return i;
             }
         }
+        //else return invalid
         return 0;
     }
 
@@ -346,21 +380,16 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(dragging && selection == 2) {
-            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
-            return;
-        }
-        if(dragging && selection == 1) {
-            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
-            return;
-        }
         if(dragging && selection == 0) {
+            //drawing a freehand line, adds a new segment on every mouse drag
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             objectList.add(new drawnObject(e.getPoint(), color, false, 0));
             lineList.set(lineList.size() - 1, objectList.size());
         }
-        if(dragging && selection == 3) {
+        if(dragging && (selection == 1 || selection == 2 || selection == 3)) {
+            //updates square
             objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
+            return;
         }
     }
 
