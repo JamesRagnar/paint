@@ -269,15 +269,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             //objectList.add(new drawnObject(p, color, circle, 3));
             layerList.get(layer).add(new drawnObject(p, color, circle, 3));
         }
-        if(selection == 4) {
-            
-        }
-        if(selection == 5) {
-            
-        }
-        if(selection == 6) {
-            
-        }
         dragging = true;
     }
     @Override
@@ -387,29 +378,23 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 for(int i = 1; i < 7; i++) {
                     if(me.getX() >= (70 * i) && me.getX() <= (70 + (70 * i))) {
                         if(i == 1) {
-                            /*
                             //undo
-                            //if(!objectList.isEmpty()) {
                             if(!layerList.get(layer).isEmpty()) {
-                                //if(objectList.get(objectList.size() - 1).type == 0 && !lineList.isEmpty()) {
                                 if(layerList.get(layer).get(layerList.get(layer).size() - 1).type == 0 && !lineList.isEmpty()) {
                                     for(int j = lineList.get(lineList.size() - 1) - 1; j > lineList.get(lineList.size() - 2) - 1; j--) {
-                                        //objectList.remove(j); //only deletes the object, temporary fix for freehand undo issue
                                         layerList.get(layer).remove(j);
                                     }
                                     lineList.remove(lineList.size() - 1);
                                     lineList.remove(lineList.size() - 1);
                                     return;
                                 }
-                                //deletedObjects.add(objectList.remove(objectList.size() - 1));
                                 deletedObjects.add(layerList.get(layer).remove(layerList.get(layer).size() - 1));
                                 return;
-                            }*/
+                            }
                         }
                         else if(i == 2) {
                             //redo
                             if(!deletedObjects.isEmpty()) {
-                                //objectList.add(deletedObjects.remove(deletedObjects.size() - 1));
                                 layerList.get(layer).add(deletedObjects.remove(deletedObjects.size() - 1));
                                 return;
                             }
