@@ -14,11 +14,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     Timer timer;
     int selection, layer;
     Point lastFree;
-    ArrayList<drawnObject> objectList;
+    //ArrayList<drawnObject> objectList;
     ArrayList<drawnObject> deletedObjects;
     ArrayList<Integer> lineList;
     ArrayList<ArrayList<drawnObject>> layerList;
-    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare, layerMenu;
+    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare, layerMenu, allLayers;
     Color color;
     
     @Override
@@ -31,16 +31,20 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         timer = new Timer(10, this);
         offscreen = createImage(this.getWidth(), this.getHeight());
         offg = offscreen.getGraphics();
-        objectList = new ArrayList();
+        //objectList = new ArrayList();
         deletedObjects = new ArrayList();
         lineList = new ArrayList();
+        layerList = new ArrayList();
+        layerList.add(new ArrayList<drawnObject>());
         color = Color.BLACK;
         dragging = false;
         paintMenu = false;
         square = false;
         circle = false;
         layerMenu = false;
+        allLayers = false;
         selection = 0;
+        layer = 0;
     }
     
     @Override
@@ -51,8 +55,19 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         
         offg.setColor(Color.BLACK);
         //All drawn objects
-        for(int i = 0; i < objectList.size(); i++) {
-            objectList.get(i).paint(offg);
+        //for(int i = 0; i < objectList.size(); i++) {
+        //    objectList.get(i).paint(offg);
+        //}
+        if(allLayers) {
+            for(int j = 0; j < layerList.size(); j++) {
+                for(int i = 0; i < layerList.get(j).size(); i++) {
+                    layerList.get(j).get(i).paint(offg);
+                }
+            }
+        } else {
+            for(int i = 0; i < layerList.get(layer).size(); i++) {
+                layerList.get(layer).get(i).paint(offg);
+            }
         }
         //Tool menu
         offg.setColor(Color.WHITE);
@@ -159,7 +174,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawRect((70 * i), 350, 70, 70);
             }
             //undo
-            if(objectList.isEmpty()) offg.setColor(Color.LIGHT_GRAY);
+            if(layerList.get(layer).isEmpty()) offg.setColor(Color.LIGHT_GRAY);
             offg.drawLine(85, 385, 125, 385);
             offg.drawLine(85, 385, 95, 380);
             offg.drawLine(85, 385, 95, 390);
@@ -219,18 +234,24 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     public void drawShape(Point p) {
         if(selection == 0) {
-            lineList.add(objectList.size()); //starting point
-            lineList.add(objectList.size()); //filler ending point
-            objectList.add(new drawnObject(p, color, false, 0));
+            //lineList.add(objectList.size()); //starting point
+            //lineList.add(objectList.size()); //filler ending point
+            //objectList.add(new drawnObject(p, color, false, 0));
+            //lineList.add(layerList.get(layer).size());
+            //lineList.add(layerList.get(layer).size());
+            layerList.get(layer).add(new drawnObject(p, color, false, 0));
         }
         if(selection == 1) {
-            objectList.add(new drawnObject(p, color, false, 1));
+            //objectList.add(new drawnObject(p, color, false, 1));
+            layerList.get(layer).add(new drawnObject(p, color, false, 1));
         }
         if(selection == 2) {
-            objectList.add(new drawnObject(p, color, square, 2));
+            //objectList.add(new drawnObject(p, color, square, 2));
+            layerList.get(layer).add(new drawnObject(p, color, square, 2));
         }
         if(selection == 3) {
-            objectList.add(new drawnObject(p, color, circle, 3));
+            //objectList.add(new drawnObject(p, color, circle, 3));
+            layerList.get(layer).add(new drawnObject(p, color, circle, 3));
         }
         if(selection == 4) {
             
@@ -315,20 +336,30 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                         }
                         else if(i == 2) {
                             //up layer
-                            layer++;
+                            if(layer < layerList.size() - 1) {
+                                layer++;
+                                allLayers = false;
+                            }
                         }
                         else if(i == 3) {
                             //down layer
-                            layer--;
+                            if(layer > 0) {
+                                layer--;
+                                allLayers = false;
+                            }
                         }
                         else if(i == 4) {
                             //view all layers
+                            if(allLayers) allLayers = false;
+                            else allLayers = true;
                         }
                         else if(i == 5) {
                             //add layer
+                            layerList.add(new ArrayList<drawnObject>());
                         }
                         else if(i == 6) {
                             //remove layer
+                            //layerList.remove(layer);
                         }
                     }
                 }
@@ -343,26 +374,30 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 for(int i = 1; i < 7; i++) {
                     if(me.getX() >= (70 * i) && me.getX() <= (70 + (70 * i))) {
                         if(i == 1) {
+                            /*
                             //undo
-                            if(!objectList.isEmpty()) {
-                                if(objectList.get(objectList.size() - 1).type == 0 && !lineList.isEmpty()) {
+                            //if(!objectList.isEmpty()) {
+                            if(!layerList.get(layer).isEmpty()) {
+                                //if(objectList.get(objectList.size() - 1).type == 0 && !lineList.isEmpty()) {
+                                if(layerList.get(layer).get(layerList.get(layer).size() - 1).type == 0 && !lineList.isEmpty()) {
                                     for(int j = lineList.get(lineList.size() - 1) - 1; j > lineList.get(lineList.size() - 2) - 1; j--) {
-                                        //undoes a object and adds it to the redo list
-                                        //deletedObjects.add(objectList.remove(j));
-                                        objectList.remove(j); //only deletes the object, temporary fix for freehand undo issue
+                                        //objectList.remove(j); //only deletes the object, temporary fix for freehand undo issue
+                                        layerList.get(layer).remove(j);
                                     }
                                     lineList.remove(lineList.size() - 1);
                                     lineList.remove(lineList.size() - 1);
                                     return;
                                 }
-                                deletedObjects.add(objectList.remove(objectList.size() - 1));
+                                //deletedObjects.add(objectList.remove(objectList.size() - 1));
+                                deletedObjects.add(layerList.get(layer).remove(layerList.get(layer).size() - 1));
                                 return;
-                            }
+                            }*/
                         }
                         else if(i == 2) {
                             //redo
                             if(!deletedObjects.isEmpty()) {
-                                objectList.add(deletedObjects.remove(deletedObjects.size() - 1));
+                                //objectList.add(deletedObjects.remove(deletedObjects.size() - 1));
+                                layerList.get(layer).add(deletedObjects.remove(deletedObjects.size() - 1));
                                 return;
                             }
                         }
@@ -437,6 +472,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 if(i == 4) {
                     if(layerMenu) layerMenu = false;
                     else layerMenu = true;
+                    return selection;
                 }
                 //returns square number with cursor hit
                 return i;
@@ -458,13 +494,17 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     public void mouseDragged(MouseEvent e) {
         if(dragging && selection == 0) {
             //drawing a freehand line, adds a new segment on every mouse drag
-            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
-            objectList.add(new drawnObject(e.getPoint(), color, false, 0));
-            lineList.set(lineList.size() - 1, objectList.size());
+            //objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
+            //objectList.add(new drawnObject(e.getPoint(), color, false, 0));
+            //lineList.set(lineList.size() - 1, objectList.size());
+            layerList.get(layer).get(layerList.get(layer).size() - 1).updatePosition(e.getPoint());
+            layerList.get(layer).add(new drawnObject(e.getPoint(), color, false, 0));
+//            lineList.set(lineList.size() - 1, layerList.get(layer).size());
         }
         if(dragging && (selection == 1 || selection == 2 || selection == 3)) {
             //updates square
-            objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
+            //objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
+            layerList.get(layer).get(layerList.get(layer).size() - 1).updatePosition(e.getPoint());
             return;
         }
     }
