@@ -1,7 +1,11 @@
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /**
@@ -75,7 +79,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         offg.setColor(Color.BLACK);
         for(int i = 0; i < 6; i++) {
             if(selection == i) {
-                offg.setColor(Color.GRAY);
+                offg.setColor(Color.LIGHT_GRAY);
                 offg.fillRect(0, (0 + (70 * i)), 70, 70);
                 offg.setColor(Color.BLACK);
                 offg.drawRect(0, (0 + (70 * i)), 70, 70);
@@ -200,28 +204,38 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         //layer menu
         if(layerMenu) {
             for(int i = 1; i < 7; i++) {
-                offg.setColor(Color.WHITE);
+                if(i == 4 && allLayers) offg.setColor(Color.LIGHT_GRAY);
+                else offg.setColor(Color.WHITE);
                 offg.fillRect((70 * i), 280, 70, 70);
                 offg.setColor(Color.BLACK);
                 offg.drawRect((70 * i), 280, 70, 70);
             }
             offg.drawString("" + layer, 103, 320);
+            //up layer
+            if(layer >= layerList.size() - 1) offg.setColor(Color.LIGHT_GRAY);
             offg.drawLine(175, 295, 175, 335);
             offg.drawLine(175, 295, 170, 305);
             offg.drawLine(175, 295, 180, 305);
+            offg.setColor(Color.BLACK);
             
+            //down layer
+            if(layer == 0) offg.setColor(Color.LIGHT_GRAY);
             offg.drawLine(245, 295, 245, 335);
             offg.drawLine(245, 335, 240, 325);
             offg.drawLine(245, 335, 250, 325);
+            offg.setColor(Color.BLACK);
             
+            //all layers
             offg.drawLine(300, 335, 315, 295);
             offg.drawLine(315, 295, 330, 335);
             offg.drawLine(305, 322, 325, 322);
-            
+            //add layer
             offg.drawLine(385, 295, 385, 335);
             offg.drawLine(365, 315, 405, 315);
-            
+            //remove layer
+            if(layerList.size() == 1) offg.setColor(Color.LIGHT_GRAY);
             offg.drawLine(435, 315, 475, 315);
+            offg.setColor(Color.BLACK);
         }
         offg.setColor(color);
         offg.fillRect(0, 420, 70, 70);
@@ -311,7 +325,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getX() > 70 && !editMenu) {
+        if(e.getX() > 70 && !editMenu && !layerMenu) {
             //starting an object
             drawShape(e.getPoint());
         }
@@ -359,7 +373,10 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                         }
                         else if(i == 6) {
                             //remove layer
-                            //layerList.remove(layer);
+                            if(layerList.size() != 1) {
+                                layerList.remove(layer);
+                                layer = 0;
+                            }
                         }
                     }
                 }
@@ -406,6 +423,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                         }
                         else if(i ==4) {
                             //save
+                            saveGame();
                         }
                         else if(i == 5) {
                             //load
@@ -526,6 +544,18 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             hoverCircle = false;
         }
     }
-
+    public void saveGame() {
+        try {
+            BufferedImage bi = (BufferedImage)offscreen;
+            File outputfile = new File("saved.png");
+            ImageIO.write(bi, "png", outputfile);
+        } catch (IOException e) {
+            System.out.println("fucked up");
+        }
+    }
+    
+    public void loadGame() {
+        
+    }
     
 }
