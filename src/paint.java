@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
@@ -18,7 +19,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     Timer timer;
     int selection, layer;
     Point lastFree;
-    //ArrayList<drawnObject> objectList;
     ArrayList<drawnObject> deletedObjects;
     ArrayList<Integer> lineList;
     ArrayList<ArrayList<drawnObject>> layerList;
@@ -35,7 +35,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         timer = new Timer(10, this);
         offscreen = createImage(this.getWidth(), this.getHeight());
         offg = offscreen.getGraphics();
-        //objectList = new ArrayList();
         deletedObjects = new ArrayList();
         lineList = new ArrayList();
         layerList = new ArrayList();
@@ -58,10 +57,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         offg.fillRect(0, 0, 1000, 490);
         
         offg.setColor(Color.BLACK);
-        //All drawn objects
-        //for(int i = 0; i < objectList.size(); i++) {
-        //    objectList.get(i).paint(offg);
-        //}
         if(allLayers) {
             for(int j = 0; j < layerList.size(); j++) {
                 for(int i = 0; i < layerList.get(j).size(); i++) {
@@ -107,8 +102,9 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         if(hoverSquare) {
             offg.setColor(Color.WHITE);
             offg.fillRect(70, 140, 70, 70);
-            offg.setColor(Color.BLACK);
+            offg.setColor(Color.LIGHT_GRAY);
             offg.drawRect(70, 140, 70, 70);
+            
             if(square) {
                 offg.drawRect(85, 165, 40, 20);
             }
@@ -116,6 +112,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.drawRect(85, 155, 40, 40);
             }
         }
+        offg.setColor(Color.BLACK);
         //circle
         if(circle) {
             offg.drawOval(13, 222, 45, 45);
@@ -126,14 +123,16 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         if(hoverCircle) {
             offg.setColor(Color.WHITE);
             offg.fillRect(70, 210, 70, 70);
-            offg.setColor(Color.BLACK);
+            offg.setColor(Color.LIGHT_GRAY);
             offg.drawRect(70, 210, 70, 70);
+            
             if(circle) {
                 offg.drawOval(83, 230, 45, 28);
             }
             else {
                 offg.drawOval(83, 222, 45, 45);
             }
+            offg.setColor(Color.BLACK);
         }
         //layers
         offg.drawLine(15, 330, 45, 330);
@@ -190,15 +189,23 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             offg.drawLine(195, 385, 185, 380);
             offg.drawLine(195, 385, 185, 390);
             offg.setColor(Color.BLACK);
-            //select
-            
+            //clear all
+            offg.drawLine(220, 360, 270, 410);
+            offg.drawLine(220, 410, 270, 360);
             //save
-            
+            offg.drawRect(300, 380, 30, 30);
+            offg.drawLine(315, 360, 315, 398);
+            offg.drawLine(310, 385, 315, 398);
+            offg.drawLine(320, 385, 315, 398);
             //load
+            offg.drawRect(370, 380, 30, 30);
+            offg.drawLine(385, 360, 385, 398);
+            offg.drawLine(385, 360, 380, 370);
+            offg.drawLine(385, 360, 390, 370);
+            //exit
+            offg.drawOval(435, 365, 40, 40);
+            offg.drawLine(455, 357, 455, 377);
             
-            //exit?
-            offg.drawLine(430, 360, 480, 410);
-            offg.drawLine(430, 410, 480, 360);
         }
         
         //layer menu
@@ -248,11 +255,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     public void drawShape(Point p) {
         if(selection == 0) {
-            //lineList.add(objectList.size()); //starting point
-            //lineList.add(objectList.size()); //filler ending point
-            //objectList.add(new drawnObject(p, color, false, 0));
-            //lineList.add(layerList.get(layer).size());
-            //lineList.add(layerList.get(layer).size());
             layerList.get(layer).add(new drawnObject(p, color, false, 0));
         }
         if(selection == 1) {
@@ -277,10 +279,6 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             
         }
         dragging = true;
-    }
-    
-    public void placeShape(Point p) {
-        
     }
     @Override
     public void update(Graphics g) {
@@ -352,14 +350,12 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                             //up layer
                             if(layer < layerList.size() - 1) {
                                 layer++;
-                                allLayers = false;
                             }
                         }
                         else if(i == 3) {
                             //down layer
                             if(layer > 0) {
                                 layer--;
-                                allLayers = false;
                             }
                         }
                         else if(i == 4) {
@@ -423,10 +419,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                         }
                         else if(i ==4) {
                             //save
-                            saveGame();
+                            saveImage();
                         }
                         else if(i == 5) {
                             //load
+                            loadImage();
                         }
                         else if(i == 6) {
                             //quit
@@ -512,16 +509,12 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     public void mouseDragged(MouseEvent e) {
         if(dragging && selection == 0) {
             //drawing a freehand line, adds a new segment on every mouse drag
-            //objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
-            //objectList.add(new drawnObject(e.getPoint(), color, false, 0));
-            //lineList.set(lineList.size() - 1, objectList.size());
             layerList.get(layer).get(layerList.get(layer).size() - 1).updatePosition(e.getPoint());
             layerList.get(layer).add(new drawnObject(e.getPoint(), color, false, 0));
-//            lineList.set(lineList.size() - 1, layerList.get(layer).size());
+//          lineList.set(lineList.size() - 1, layerList.get(layer).size());
         }
         if(dragging && (selection == 1 || selection == 2 || selection == 3)) {
             //updates square
-            //objectList.get(objectList.size() - 1).updatePosition(e.getPoint());
             layerList.get(layer).get(layerList.get(layer).size() - 1).updatePosition(e.getPoint());
             return;
         }
@@ -544,7 +537,14 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             hoverCircle = false;
         }
     }
-    public void saveGame() {
+    public void saveImage() {
+        offscreen = createImage(this.getWidth(), this.getHeight());
+        for(int j = 0; j < layerList.size(); j++) {
+                for(int i = 0; i < layerList.get(j).size(); i++) {
+                    layerList.get(j).get(i).paint(offscreen.getGraphics());
+                }
+            }
+        
         try {
             BufferedImage bi = (BufferedImage)offscreen;
             File outputfile = new File("saved.png");
@@ -552,10 +552,15 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         } catch (IOException e) {
             System.out.println("fucked up");
         }
+        offg = offscreen.getGraphics();
     }
     
-    public void loadGame() {
-        
-    }
-    
+    public void loadImage() {
+        try {
+            URL url = new URL(getCodeBase(), "saved.jpg");
+            offscreen = ImageIO.read(url);
+        } catch (IOException e) {
+            System.out.println("fucked up");
+        }
+    } 
 }
