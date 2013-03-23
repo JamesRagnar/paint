@@ -400,7 +400,8 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                             }
                         }
                         else if(i == 3) {
-                            //select
+                            //clear
+                            layerList.get(layer).clear();
                         }
                         else if(i ==4) {
                             //save
@@ -496,7 +497,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             //drawing a freehand line, adds a new segment on every mouse drag
             layerList.get(layer).get(layerList.get(layer).size() - 1).updatePosition(e.getPoint());
             layerList.get(layer).add(new drawnObject(e.getPoint(), color, false, 0));
-//          lineList.set(lineList.size() - 1, layerList.get(layer).size());
+            //lineList.set(lineList.size() - 1, layerList.get(layer).size());
         }
         if(dragging && (selection == 1 || selection == 2 || selection == 3)) {
             //updates square
