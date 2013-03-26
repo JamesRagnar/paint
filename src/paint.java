@@ -12,7 +12,15 @@ import javax.swing.Timer;
 /**
  *
  * @author Ragnar
+ * This is a basic image editing program designed for efficient Human/Computer interaction
+ * Created as a Java Applet, the program runs in a web page and executed by the JVM
+ * 
+ * The program provides basic tools for creating images: Lines, Rectangles, Circles, and FreeHand
+ * The Square and Circle tools can be toggled to Rectangle and Ellipse options by clicking on the selected tool again
+ * The Layer functionality provides a way for an images to be separated in multiple parts
+ * Layers can be added and removed easily, or viewed all at once by toggling the "A" option
  */
+
 public class paint extends Applet implements KeyListener, MouseListener, MouseMotionListener, ActionListener {
     Image offscreen;
     Graphics offg;
