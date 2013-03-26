@@ -23,6 +23,7 @@ import javax.swing.Timer;
 
 public class paint extends Applet implements KeyListener, MouseListener, MouseMotionListener, ActionListener {
     Image offscreen;
+    Image savedImage;
     Graphics offg;
     Timer timer;
     int selection, layer;
@@ -30,7 +31,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     ArrayList<drawnObject> deletedObjects;
     ArrayList<Integer> lineList;
     ArrayList<ArrayList<drawnObject>> layerList;
-    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare, layerMenu, allLayers;
+    boolean dragging, paintMenu, editMenu, square, circle, hoverCircle, hoverSquare, layerMenu, allLayers, loadImage;
     Color color;
     
     @Override
@@ -54,6 +55,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         circle = false;
         layerMenu = false;
         allLayers = false;
+        loadImage = false;
         selection = 0;
         layer = 0;
     }
@@ -65,6 +67,11 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         offg.fillRect(0, 0, 1000, 490);
         
         offg.setColor(Color.BLACK);
+        if(loadImage) {
+            offg.drawImage(savedImage, 0, 0, this);
+        }
+        
+        
         if(allLayers) {
             for(int j = 0; j < layerList.size(); j++) {
                 for(int i = 0; i < layerList.get(j).size(); i++) {
@@ -544,19 +551,21 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
             BufferedImage bi = (BufferedImage)offscreen;
             File outputfile = new File("saved.png");
             ImageIO.write(bi, "png", outputfile);
+            System.out.println("Image Saved");
         } catch (IOException e) {
-            System.out.println("fucked up");
+            System.out.println("Fucked up saving");
         }
         offg = offscreen.getGraphics();
     }
     
     public void loadImage() {
         try {
-            URL url = new URL(getCodeBase(), "saved.png");
-            offscreen = ImageIO.read(url);
-            offg = offscreen.getGraphics();
-        } catch (IOException e) {
-            System.out.println("fucked up");
+            savedImage = ImageIO.read(new File("saved.png"));
+            System.out.println("Image Loaded");
+
+            loadImage = true;
+        } catch (Exception e) {
+            System.out.println("Fucked up loading");
         }
     } 
 }
