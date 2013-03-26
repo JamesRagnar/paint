@@ -217,7 +217,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
                 offg.setColor(Color.BLACK);
                 offg.drawRect((70 * i), 280, 70, 70);
             }
-            offg.drawString("" + layer, 103, 320);
+            offg.drawString("" + (layer + 1), 103, 320);
             //up layer
             if(layer >= layerList.size() - 1) offg.setColor(Color.LIGHT_GRAY);
             offg.drawLine(175, 295, 175, 335);
@@ -314,7 +314,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getX() > 70 && !editMenu && !layerMenu) {
+        if(e.getX() > 70 && !editMenu && !layerMenu && !paintMenu) {
             //starting an object
             drawShape(e.getPoint());
         }
@@ -424,6 +424,7 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
         }
         if(paintMenu) {
             //selecting a color
+            
             if(me.getY() >= 420) {
                 for(int i = 1; i < 11; i++) {
                     if(me.getX() >= 70 && me.getX() <= (70 + (70 * i))) {
@@ -543,8 +544,9 @@ public class paint extends Applet implements KeyListener, MouseListener, MouseMo
     
     public void loadImage() {
         try {
-            URL url = new URL(getCodeBase(), "saved.jpg");
+            URL url = new URL(getCodeBase(), "saved.png");
             offscreen = ImageIO.read(url);
+            offg = offscreen.getGraphics();
         } catch (IOException e) {
             System.out.println("fucked up");
         }
